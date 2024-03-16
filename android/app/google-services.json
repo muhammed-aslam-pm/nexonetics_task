@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "948023019136",
-    "project_id": "gallery-app-14715",
-    "storage_bucket": "gallery-app-14715.appspot.com"
+    "project_number": "319805430390",
+    "project_id": "nexonetics-task",
+    "storage_bucket": "nexonetics-task.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:948023019136:android:3970440208eea468a94865",
+        "mobilesdk_app_id": "1:319805430390:android:01bb0130f04c42f24f9d57",
         "android_client_info": {
           "package_name": "com.example.nexonetics_task"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCPvMyiyukRJHIM2_RFr6XLwwtkCuupyDU"
+          "current_key": "AIzaSyCjtJDCNwRLPAhvYpAsRY1AWGy2r8SBBDc"
         }
       ],
       "services": {

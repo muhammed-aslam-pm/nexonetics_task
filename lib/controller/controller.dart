@@ -1,5 +1,13 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:nexonetics_task/model/media_item_model.dart';
+import 'package:path/path.dart';
+
+// ... rest of your code
 
 class Controller with ChangeNotifier {
   List<String> images = [
@@ -12,6 +20,54 @@ class Controller with ChangeNotifier {
   ];
   int selectedIndex = 0;
   PageController pageController = PageController();
+  String fileName = "";
+  final _db = FirebaseFirestore.instance;
+  Future<void> pickAndUploadMedia() async {
+    final pickedFile = await pickImageOrVideo();
+    print("Picked file : $pickedFile");
+    if (pickedFile != null) {
+      // Process and compress video if it's a video
+      // final compressedFile = pickedFile.type == 'video'
+      //     ? await compressVideo(pickedFile)
+      //     : pickedFile;
+      // final mediaType = pickedFile.mimeType;
+      print("Name : ${pickedFile.name}");
+      print("Return type : ${pickedFile.runtimeType.toString()}");
+      print("to String : ${pickedFile.toString()}");
+
+      String type = await checkFileType(pickedFile);
+      // if (mediaType != null) {
+      //   print("mediatipe: $mediaType");
+
+      //   if (mediaType.startsWith('image/jpeg') ||
+      //       mediaType.startsWith('image/png') ||
+      //       mediaType.startsWith('image/gif')) {
+      //     type = 'image';
+      //   } else if (mediaType.startsWith('video/mp4') ||
+      //       mediaType.startsWith('video/quicktime')) {
+      //     type = 'video';
+      //   } else {
+      //     type = 'unsupported';
+      //   }
+      // }
+
+      print("type:  $type");
+      final uploadUrl = await uploadFile(pickedFile.path);
+      print("uploadurl: $uploadUrl");
+      if (uploadUrl != null) {
+        final media = MediaItemModel(url: uploadUrl, type: type, size: "20");
+        await addMedia(media);
+      }
+      // setState(() {
+      //   _mediaItems.add(MediaItem(
+      //     id: UniqueKey().toString(),
+      //     url: uploadUrl,
+      //     type: pickedFile.type,
+      //   ));
+      // });
+    }
+  }
+
   open(int index) {
     selectedIndex = index;
     notifyListeners();
@@ -21,5 +77,55 @@ class Controller with ChangeNotifier {
     final picker = ImagePicker();
     final pickedFile = await picker.pickMedia();
     return pickedFile;
+  }
+
+  Future<String?> uploadFile(String filePath) async {
+    try {
+      fileName = basename(filePath);
+      final storageRef =
+          FirebaseStorage.instance.ref().child('uploads/$fileName');
+      final uploadTask = storageRef.putFile(File(filePath));
+      final snapshot = await uploadTask.whenComplete(() => null);
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print("Exeption : $e");
+      return null;
+    }
+  }
+
+  Future<String> checkFileType(XFile? pickedFile) async {
+    final _pickedMedia = File(pickedFile!.path);
+
+    final String? mimeType = await _pickedMedia.readAsBytes().then((value) {
+      final List<int> bytes = value;
+      if (bytes.length >= 8) {
+        if (bytes[0] == 0x52 &&
+            bytes[1] == 0x49 &&
+            bytes[2] == 0x46 &&
+            bytes[3] == 0x46 &&
+            bytes[8] == 0x57 &&
+            bytes[9] == 0x41 &&
+            bytes[10] == 0x56 &&
+            bytes[11] == 0x45) {
+          return 'video/mp4';
+        }
+      }
+      return null;
+    });
+
+    if (mimeType != null) {
+      return "video";
+    } else {
+      return "photo";
+    }
+  }
+
+  addMedia(MediaItemModel media) async {
+    try {
+      await _db.collection("Media").add(media.toJson());
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

@@ -2,7 +2,7 @@ class MediaItemModel {
   final String? id;
   final String url;
   final String type;
-  final int size;
+  final String size;
 
   MediaItemModel(
       {this.id, required this.url, required this.type, required this.size});
@@ -18,6 +18,6 @@ class MediaItemModel {
         id: json['id'] as String,
         url: json['url'] as String,
         type: json['type'] as String,
-        size: json['size'] as int,
+        size: json['size'] as String,
       );
 }

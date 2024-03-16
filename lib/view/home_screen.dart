@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.upload),
         onPressed: () {
-          Controller().pickImageOrVideo();
+          Controller().pickAndUploadMedia();
         },
       ),
     );
