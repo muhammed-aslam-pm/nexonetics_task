@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:nexonetics_task/controller/controller.dart';
+import 'package:nexonetics_task/model/media_item_model.dart';
 import 'package:nexonetics_task/utils/color_constants.dart';
 import 'package:nexonetics_task/widgets/download_button.dart';
+import 'package:provider/provider.dart';
 
 import '../utils/style_constants.dart';
 
 class DetailesTab extends StatelessWidget {
   const DetailesTab({
     super.key,
+    required this.media,
   });
+  final MediaItemModel media;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +47,10 @@ class DetailesTab extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: DownloadButton(
-                    onTap: () {},
+                    onTap: () {
+                      Provider.of<Controller>(context, listen: false)
+                          .launchURL(media.url);
+                    },
                   ),
                 ),
               ),
@@ -49,7 +58,10 @@ class DetailesTab extends StatelessWidget {
                 flex: 1,
                 child: Center(
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Provider.of<Controller>(context, listen: false)
+                          .deletePhoto(context: context, id: media.id!);
+                    },
                     icon: Icon(
                       Icons.delete_outline,
                       color: ColorConstants.colorRed,
@@ -91,7 +103,7 @@ class DetailesTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Screenshot 2024",
+                      media.title,
                       style: StyleConstants.description1,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,
@@ -122,7 +134,7 @@ class DetailesTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Thu, 14 Mar, 2024 . 2:29 pm",
+                      DateFormat('E, d MMM, y . h:mm a').format(media.date),
                       style: StyleConstants.description1,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,

@@ -14,4 +14,12 @@ class StyleConstants {
       color: ColorConstants.colorBlack,
       fontSize: 14,
       fontWeight: FontWeight.w500);
+  static TextStyle tabbarSelectedLabel = TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      color: ColorConstants.colorWhite);
+  static TextStyle tabbarUnselectedLabel = TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      color: ColorConstants.colorBlack);
 }

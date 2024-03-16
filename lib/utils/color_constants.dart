@@ -5,5 +5,6 @@ class ColorConstants {
   static Color colorWhite = Colors.white;
   static Color colorBlack = Colors.black;
   static Color colorRed = Colors.red;
+  static Color colorBlue = Colors.blueAccent;
   static Color? colorGrey = Colors.grey[400];
 }
