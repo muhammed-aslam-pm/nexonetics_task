@@ -23,6 +23,9 @@ class MediaOpenScreen extends StatelessWidget {
           );
         },
         child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Title"),
+          ),
           body: Center(
             child: Image.network(
               controller.images[index],

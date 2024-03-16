@@ -14,7 +14,6 @@ class Controller with ChangeNotifier {
   PageController pageController = PageController();
   open(int index) {
     selectedIndex = index;
-
     notifyListeners();
   }
 
