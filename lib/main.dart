@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => Controller())],
       builder: (context, child) => const MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: HomeScreen(),
       ),
     );
