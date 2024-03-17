@@ -45,8 +45,8 @@ class TypeSelectingBottomSheet extends StatelessWidget {
           Expanded(
               child: Expanded(
                   child: InkWell(
-            onTap: () =>
-                Provider.of<Controller>(context, listen: false).uploadVideo(),
+            onTap: () => Provider.of<Controller>(context, listen: false)
+                .uploadVideo(context),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               decoration: BoxDecoration(

@@ -3,8 +3,8 @@ import 'package:nexonetics_task/controller/controller.dart';
 import 'package:nexonetics_task/view/details_tab.dart';
 import 'package:provider/provider.dart';
 
-class MediaOpenScreen extends StatelessWidget {
-  const MediaOpenScreen({super.key});
+class PhotoOpenScreen extends StatelessWidget {
+  const PhotoOpenScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nexonetics_task/controller/controller.dart';
@@ -5,7 +7,6 @@ import 'package:nexonetics_task/model/media_item_model.dart';
 import 'package:nexonetics_task/utils/color_constants.dart';
 import 'package:nexonetics_task/widgets/download_button.dart';
 import 'package:provider/provider.dart';
-
 import '../utils/style_constants.dart';
 
 class DetailesTab extends StatelessWidget {
@@ -46,6 +47,7 @@ class DetailesTab extends StatelessWidget {
                 flex: 3,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
+                  //------------------------------------------------------------download button
                   child: DownloadButton(
                     onTap: () {
                       Provider.of<Controller>(context, listen: false)
@@ -57,11 +59,19 @@ class DetailesTab extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Center(
+                  //------------------------------------------------------------delete button
                   child: IconButton(
-                    onPressed: () {
-                      Provider.of<Controller>(context, listen: false)
-                          .deletePhoto(context: context, id: media.id!);
-                    },
+                    onPressed: media.type == "photo"
+                        ? () {
+                            Provider.of<Controller>(context, listen: false)
+                                .deletePhoto(context: context, id: media.id!);
+                          }
+                        : () async {
+                            await Provider.of<Controller>(context,
+                                    listen: false)
+                                .deleteVideo(context: context, id: media.id!);
+                            Navigator.pop(context);
+                          },
                     icon: Icon(
                       Icons.delete_outline,
                       color: ColorConstants.colorRed,
@@ -78,6 +88,7 @@ class DetailesTab extends StatelessWidget {
             color: ColorConstants.colorGrey,
           ),
           gap,
+          //--------------------------------------------------------------------Other Detailes
           Text(
             "Details",
             style: StyleConstants.title1,
