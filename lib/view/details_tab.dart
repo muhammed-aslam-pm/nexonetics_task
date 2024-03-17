@@ -176,7 +176,7 @@ class DetailesTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "27.2 MB",
+                      media.size,
                       style: StyleConstants.description1,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 3,

@@ -9,6 +9,7 @@ import 'package:nexonetics_task/model/media_item_model.dart';
 import 'package:nexonetics_task/utils/color_constants.dart';
 import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class Controller with ChangeNotifier {
@@ -26,13 +27,14 @@ class Controller with ChangeNotifier {
     );
     if (pickedFile != null) {
       final uploadUrl = await uploadFile(pickedFile.path);
+      final double size = await pickedFile.length() / 1000000;
 
       if (uploadUrl != null) {
         final media = MediaItemModel(
             title: pickedFile.name,
             url: uploadUrl,
             type: "photo",
-            size: "20",
+            size: "$size MB",
             date: DateTime.now());
         await addPhoto(media);
         Navigator.pop(context);
@@ -46,18 +48,24 @@ class Controller with ChangeNotifier {
 //------------------------------------------------------------------------------Upload Video
   uploadVideo(BuildContext context) async {
     final picker = ImagePicker();
+    late final uploadUrl;
+    late final double size;
     final pickedFile = await picker.pickVideo(
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
-      final uploadUrl = await uploadFile(pickedFile.path);
+      final info = await compressVideo(pickedFile.path);
+      if (info != null) {
+        size = info.filesize! / 1000000;
+        uploadUrl = await uploadFile(info.path!);
+      }
 
       if (uploadUrl != null) {
         final media = MediaItemModel(
             title: pickedFile.name,
             url: uploadUrl,
             type: "video",
-            size: "20",
+            size: "$size MB",
             date: DateTime.now());
         await addVideo(media);
         Navigator.pop(context);
@@ -77,7 +85,9 @@ class Controller with ChangeNotifier {
               MediaItemModel.fromSnapshot(documentSnapshot))
           .toList();
       videos = videoFiles;
-      notifyListeners();
+      if (videos.isNotEmpty) {
+        thumbnails = await fetchThumbnails(videos);
+      }
       final photoResults = await _db.collection("Photos").get();
       final photoFiles = photoResults.docs
           .map((documentSnapshot) =>
@@ -85,11 +95,7 @@ class Controller with ChangeNotifier {
           .toList();
       photos = photoFiles;
       notifyListeners();
-      if (videos.isNotEmpty) {
-        thumbnails = await fetchThumbnails(videos);
-      }
       print(photos);
-      notifyListeners();
     } catch (e) {
       print("Error: $e");
       rethrow;
@@ -198,6 +204,15 @@ class Controller with ChangeNotifier {
     }
 
     return tempThumbnails;
+  }
+
+//------------------------------------------------------------------------------Compress Video
+  Future<MediaInfo?> compressVideo(String filePath) async {
+    final compressedFile = await VideoCompress.compressVideo(
+      filePath,
+      quality: VideoQuality.MediumQuality,
+    );
+    return compressedFile;
   }
 
 //------------------------------------------------------------------------------add video to firebase database
