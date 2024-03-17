@@ -19,6 +19,9 @@ class Controller with ChangeNotifier {
   List<MediaItemModel> videos = [];
   List<MediaItemModel> photos = [];
   List<Widget> thumbnails = [];
+  bool loading = false;
+  bool videoUploading = false;
+  bool photoUploading = false;
 //------------------------------------------------------------------------------Upload Photo
   uploadPhoto(BuildContext context) async {
     final picker = ImagePicker();
@@ -47,38 +50,51 @@ class Controller with ChangeNotifier {
 
 //------------------------------------------------------------------------------Upload Video
   uploadVideo(BuildContext context) async {
-    final picker = ImagePicker();
-    late final uploadUrl;
-    late final double size;
-    final pickedFile = await picker.pickVideo(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      final info = await compressVideo(pickedFile.path);
-      if (info != null) {
-        size = info.filesize! / 1000000;
-        uploadUrl = await uploadFile(info.path!);
-      }
+    try {
+      videoUploading = true;
+      notifyListeners();
+      final picker = ImagePicker();
+      late final uploadUrl;
+      late final double size;
+      final pickedFile = await picker.pickVideo(
+        source: ImageSource.gallery,
+      );
+      if (pickedFile != null) {
+        final info = await compressVideo(pickedFile.path);
+        if (info != null) {
+          size = info.filesize! / 1000000;
+          uploadUrl = await uploadFile(info.path!);
+        }
 
-      if (uploadUrl != null) {
-        final media = MediaItemModel(
-            title: pickedFile.name,
-            url: uploadUrl,
-            type: "video",
-            size: "$size MB",
-            date: DateTime.now());
-        await addVideo(media);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Video Uploaded!")));
-        await fetchMedias();
+        if (uploadUrl != null) {
+          final media = MediaItemModel(
+              title: pickedFile.name,
+              url: uploadUrl,
+              type: "video",
+              size: "$size MB",
+              date: DateTime.now());
+          await addVideo(media);
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Video Uploaded!")));
+          await fetchMedias();
+        }
       }
+      videoUploading = false;
+      notifyListeners();
+    } catch (e) {
+      print("error :$e");
+    } finally {
+      videoUploading = false;
+      notifyListeners();
     }
   }
 
 //------------------------------------------------------------------------------Fetch All Medias
   fetchMedias() async {
     try {
+      loading = true;
+      notifyListeners();
       final videoResults = await _db.collection("Videos").get();
       final videoFiles = videoResults.docs
           .map((documentSnapshot) =>
@@ -94,11 +110,15 @@ class Controller with ChangeNotifier {
               MediaItemModel.fromSnapshot(documentSnapshot))
           .toList();
       photos = photoFiles;
+      loading = false;
       notifyListeners();
       print(photos);
     } catch (e) {
       print("Error: $e");
       rethrow;
+    } finally {
+      loading = false;
+      notifyListeners();
     }
   }
 

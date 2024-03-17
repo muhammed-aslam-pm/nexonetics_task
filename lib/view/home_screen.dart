@@ -39,75 +39,84 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TabBarView(children: [
                 //--------------------------------------------------------------Photos Section
                 Consumer<Controller>(
-                  builder: (context, value, child) => value.photos.isEmpty
+                  builder: (context, value, child) => value.loading
                       ? const Center(
-                          child: Text("No Media Available"),
+                          child: CircularProgressIndicator(),
                         )
-                      : Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 5,
-                              crossAxisSpacing: 5,
-                            ),
-                            itemCount: value.photos.length,
-                            itemBuilder: (context, index) => InkWell(
-                              onTap: () {
-                                Provider.of<Controller>(context, listen: false)
-                                    .open(index);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PhotoOpenScreen()));
-                              },
-                              child: Hero(
-                                tag: value.photos[index].url,
-                                child: Image.network(
-                                  value.photos[index].url,
-                                  fit: BoxFit.cover,
+                      : value.photos.isEmpty
+                          ? const Center(
+                              child: Text("No Media Available"),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 5,
+                                  crossAxisSpacing: 5,
+                                ),
+                                itemCount: value.photos.length,
+                                itemBuilder: (context, index) => InkWell(
+                                  onTap: () {
+                                    Provider.of<Controller>(context,
+                                            listen: false)
+                                        .open(index);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const PhotoOpenScreen()));
+                                  },
+                                  child: Hero(
+                                    tag: value.photos[index].url,
+                                    child: Image.network(
+                                      value.photos[index].url,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
                 ),
                 //--------------------------------------------------------------Videos Section
                 Consumer<Controller>(
-                  builder: (context, value, child) => value.videos.isEmpty
+                  builder: (context, value, child) => value.loading
                       ? const Center(
-                          child: Text("No Videos Available"),
+                          child: CircularProgressIndicator(),
                         )
-                      : Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisSpacing: 5,
-                              crossAxisSpacing: 5,
-                            ),
-                            itemCount: value.videos.length,
-                            itemBuilder: (context, index) => InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ViedoPlayScreen(
-                                      video: value.videos[index],
-                                    ),
+                      : value.videos.isEmpty
+                          ? const Center(
+                              child: Text("No Videos Available"),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  mainAxisSpacing: 5,
+                                  crossAxisSpacing: 5,
+                                ),
+                                itemCount: value.videos.length,
+                                itemBuilder: (context, index) => InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ViedoPlayScreen(
+                                          video: value.videos[index],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: value.videos[index].url,
+                                    child: value.thumbnails[index],
                                   ),
-                                );
-                              },
-                              child: Hero(
-                                tag: value.videos[index].url,
-                                child: value.thumbnails[index],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
                 )
               ]),
             ),
