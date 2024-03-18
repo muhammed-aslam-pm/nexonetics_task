@@ -62,9 +62,11 @@ class DetailesTab extends StatelessWidget {
                   //------------------------------------------------------------delete button
                   child: IconButton(
                     onPressed: media.type == "photo"
-                        ? () {
-                            Provider.of<Controller>(context, listen: false)
+                        ? () async {
+                            await Provider.of<Controller>(context,
+                                    listen: false)
                                 .deletePhoto(context: context, id: media.id!);
+                            Navigator.pop(context);
                           }
                         : () async {
                             await Provider.of<Controller>(context,
