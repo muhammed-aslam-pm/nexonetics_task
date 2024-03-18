@@ -3,11 +3,13 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:nexonetics_task/model/media_item_model.dart';
 import 'package:nexonetics_task/utils/color_constants.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -29,8 +31,9 @@ class Controller with ChangeNotifier {
       source: ImageSource.gallery,
     );
     if (pickedFile != null) {
-      final uploadUrl = await uploadFile(pickedFile.path);
-      final double size = await pickedFile.length() / 1000000;
+      final compressedImage = await compressImage(File(pickedFile.path));
+      final uploadUrl = await uploadFile(compressedImage!.path);
+      final double size = await compressedImage.length() / 1000000;
 
       if (uploadUrl != null) {
         final media = MediaItemModel(
@@ -224,6 +227,29 @@ class Controller with ChangeNotifier {
     }
 
     return tempThumbnails;
+  }
+
+//------------------------------------------------------------------------------Compress Photo
+
+  Future<XFile?> compressImage(File? imageFile) async {
+    if (imageFile == null) return null;
+
+    final tempDir = await getTemporaryDirectory();
+    final tempPath = tempDir.path;
+    final fileName = imageFile.path.split('/').last;
+    final compressedImageFile = File('$tempPath/$fileName.jpg');
+
+    await imageFile.copy('$tempPath/${fileName}_temp.jpg');
+    final result = await FlutterImageCompress.compressAndGetFile(
+      '$tempPath/${fileName}_temp.jpg',
+      compressedImageFile.path,
+      quality: 50, //quality
+    );
+
+    // Delete temporary file
+    File('$tempPath/${fileName}_temp.jpg').delete();
+
+    return result;
   }
 
 //------------------------------------------------------------------------------Compress Video
